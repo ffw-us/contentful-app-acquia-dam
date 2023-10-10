@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function InstantSearch({ sdk }) {
-  const authToken = sdk.parameters.installation.authToken;
-
+export function InstantSearch({ onSelect, authToken }) {
   const [instantsearchUrl, setInstantsearchUrl] = useState();
   useEffect(() => {
     const fetchInstasearchUrl = async () => {
@@ -19,7 +17,7 @@ export function InstantSearch({ sdk }) {
   useEffect(() => {
     const action = (event) => {
       if (event.data?.action == "embed") {
-        sdk.close([event.data.items[0]]);
+        onSelect([event.data.items[0]]);
       }
     };
 
@@ -29,7 +27,7 @@ export function InstantSearch({ sdk }) {
   }, []);
 
   if (instantsearchUrl === undefined) {
-    return <div>Loading... </div>;
+    return null; // Loading state.
   }
 
   return <iframe width={1200} height={800} src={instantsearchUrl} />;

@@ -55,12 +55,42 @@ function makeThumbnail(attachment) {
   return [url, alt];
 }
 
+function canAddAssets(currentValue, maxAllowedAssets) {
+  if (maxAllowedAssets === 0) {
+    return true;
+  }
+  const itemsLength = Array.isArray(currentValue) ? currentValue.length : 0;
+
+  if (itemsLength >= maxAllowedAssets) {
+    return false;
+  }
+}
+
+function DialogLocation({ sdk }) {
+  const {
+    config,
+    instance: instanceConfig,
+    currentValue,
+  } = sdk.parameters.invocation;
+  const { authToken } = config;
+
+  return <InstantSearch onSelect={sdk.close} authToken={authToken} />;
+}
+
 async function renderDialog(sdk) {
-  render(<InstantSearch sdk={sdk} />, document.getElementById("root"));
+  render(<DialogLocation sdk={sdk} />, document.getElementById("root"));
   sdk.window.startAutoResizer();
 }
 
-async function openDialog(sdk, _currentValue, _config) {
+async function openDialog(sdk, currentValue, config) {
+  const maxAllowedAssets = sdk.parameters.instance.maxAllowedAssets;
+  if (canAddAssets(currentValue, maxAllowedAssets) === false) {
+    sdk.notifier.error(
+      `Maximum number of assets (${maxAllowedAssets}) have been selected. Please remove some assets and try again.`
+    );
+    return [];
+  }
+
   const result = await sdk.dialogs.openCurrentApp({
     position: "center",
     title: CTA,
@@ -68,6 +98,11 @@ async function openDialog(sdk, _currentValue, _config) {
     shouldCloseOnEscapePress: true,
     width: 1200,
     minHeight: 800,
+    parameters: {
+      config,
+      instance: { ...sdk.parameters.instance },
+      currentValue,
+    },
     allowHeightOverflow: true,
   });
 
