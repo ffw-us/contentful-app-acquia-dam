@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
 
-export function InstantSearch({ onSelect, authToken }) {
+export function InstantSearch({
+  onSelect,
+  authToken,
+  initialQuery = "",
+  hideSearchBar = false,
+}) {
   const [instantsearchUrl, setInstantsearchUrl] = useState();
   useEffect(() => {
     const fetchInstasearchUrl = async () => {
       const response = await fetch(
-        `https://api.widencollective.com/v2/integrations/url`,
+        `https://api.widencollective.com/v2/integrations/url?${new URLSearchParams(
+          {
+            query: initialQuery,
+            hideSearchBar,
+          }
+        )}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       return response.json();

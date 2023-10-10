@@ -67,14 +67,17 @@ function canAddAssets(currentValue, maxAllowedAssets) {
 }
 
 function DialogLocation({ sdk }) {
-  const {
-    config,
-    instance: instanceConfig,
-    currentValue,
-  } = sdk.parameters.invocation;
+  const { config, instance: instanceConfig } = sdk.parameters.invocation;
   const { authToken } = config;
 
-  return <InstantSearch onSelect={sdk.close} authToken={authToken} />;
+  return (
+    <InstantSearch
+      onSelect={sdk.close}
+      authToken={authToken}
+      initialQuery={instanceConfig.initialQuery}
+      hideSearchBar={instanceConfig.hideSearchBar}
+    />
+  );
 }
 
 async function renderDialog(sdk) {
